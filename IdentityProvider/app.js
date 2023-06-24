@@ -13,7 +13,7 @@ const App = express();
 App.use(express.json());
 App.use(cookieParser());
 App.use((req, res, next) => {
-    const allowedOrigins = ["http://guessthesong.us-east-1.elasticbeanstalk.com", "http://localhost:8080"]
+    const allowedOrigins = ["https://i7vwspeb2s.us-east-1.awsapprunner.com", "http://localhost:8080"]
     if (allowedOrigins.includes(req.headers.origin)) {
         console.log(req.headers.origin);
         res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
