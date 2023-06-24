@@ -4,12 +4,12 @@ export const authenticate = (username, password, matchUser, res) => {
 
     if (username == matchUser.username && password == matchUser.hashed_password) {
         res.cookie('token', jsonwebtoken.sign({ user: username }, process.env.JWT_SECRET + matchUser.user_id, { expiresIn: process.env.JWT_EXPIRATION_TIME}), { 
-            httpOnly: true,
+            httpOnly: false,
             sameSite: "None",
             secure: true
         });
         res.cookie('user', username, { 
-            httpOnly: true,
+            httpOnly: false,
             sameSite: "None",
             secure: true
         });
