@@ -8,15 +8,16 @@
     <link rel="stylesheet" href="login.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="authentication.js"></script>
+    <script src="formControl.js"></script>
   </head>
   <body>
     <main>
-      <div class="formMock">
+      <div class="formMock" id="formEl">
         <input type="text" id="loginUsername"/>
         <input type="text" id="loginPassword"/>
         <button onclick="loginExecute()">Login</button>
       </div>
-      <p>No account? <a>Register</a></p>
+      <p id="accountMessage">No account? <a id="switchLink" onclick="switchToRegister()">Register</a></p>
     </main>
   </body>
 </html>

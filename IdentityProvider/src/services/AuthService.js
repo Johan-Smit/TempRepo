@@ -3,21 +3,28 @@ import jsonwebtoken from 'jsonwebtoken';
 export const authenticate = (username, password, matchUser, res) => {
 
     if (username == matchUser.username && password == matchUser.hashed_password) {
-        res.cookie('token', jsonwebtoken.sign({ user: username }, process.env.JWT_SECRET + matchUser.user_id, { expiresIn: process.env.JWT_EXPIRATION_TIME}), { 
-            httpOnly: false,
+
+        const token =  jsonwebtoken.sign({ user: username }, process.env.JWT_SECRET + matchUser.user_id, { expiresIn: process.env.JWT_EXPIRATION_TIME});
+
+        res.cookie('token', token, { 
+            httpOnly: true,
             sameSite: "None",
-            secure: true
+            secure: false
         });
         res.cookie('user', username, { 
-            httpOnly: false,
-            sameSite: "None",
+            httpOnly: true,
+            sameSite: "lax",
             secure: true
         });
 
         return {
             status: 200,
             message: "Success",
-            reason: "Authentication successfull"
+            reason: "Authentication successfull",
+            data: {
+                token: token,
+                username: username
+            }
         }
     }
     

@@ -3,13 +3,12 @@ const authenticationController = require("../controllers/AuthenticationControlle
 
 const verifyRequest = async (req, res, next) => {
 
-    if (req.url == "/authenticate") {
+    if (req.path == "/authenticate") {
         next();
         return;
     }
 
     if ((!req.cookies.token || !req.cookies.user)) {
-        console.log("nope")
         res.redirect("/authenticate");
     }
     else {
