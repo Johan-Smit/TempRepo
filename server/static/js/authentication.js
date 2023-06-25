@@ -19,7 +19,7 @@ async function login(username, password) {
     );
 
     document.cookie = "token=" + authResult.data.data.token;
-    document.cookie = "username=" + authResult.data.data.username;
+    document.cookie = "user=" + authResult.data.data.username;
 
     if (authResult.data.message == "Success") {
         location.href = "/";
