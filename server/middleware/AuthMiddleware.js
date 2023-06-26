@@ -9,22 +9,28 @@ const verifyRequest = async (req, res, next) => {
     }
 
     if ((!req.cookies.token || !req.cookies.user)) {
-        console.log("no cookies or token");
-        console.log(req.cookies.token);
-        console.log(req.cookies.user);
+        console.log("No auth");
         res.redirect("/authenticate");
     }
     else {
 
-        const verificationResult = await authenticationController.verifyToken(req.cookies.user, req.cookies.token);
-        console.log("verify result");
-        console.log(verificationResult);
-
-        if (verificationResult.data.message == "Success") {
-            next();
+        try{
+            const verificationResult = await authenticationController.verifyToken(req.cookies.user, req.cookies.token);
+            if (verificationResult.data.message == "Success") {
+                console.log(verificationResult.data);
+                console.log(req.cookies.token);
+                console.log(verificationResult.data.data.token);
+                res.cookie("token", verificationResult.data.data.token);
+                res.cookie("user", verificationResult.data.data.user);
+                next();
+            }
+            else {
+                console.log(verificationResult);
+                res.redirect("/authenticate");
+            }
         }
-        else {
-            res.redirect("/authenticate");
+        catch (error) {
+            console.log(error);
         }
     }
 }
