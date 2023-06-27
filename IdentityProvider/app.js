@@ -23,6 +23,13 @@ App.use((req, res, next) => {
     next();
   });
 
+  // App.use(cors({
+  //   origin: process.env.ALLOWED_ORIGIN,
+  //   preflightContinue: true,
+  //   credentials: true,
+  // }));
+
+
 const Port = process.env.PORT || 8081;
 
 
