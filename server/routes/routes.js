@@ -1,15 +1,15 @@
 module.exports = (app) => {
+    const staticResourceController = require("../controllers/StaticResourceController");
     const userController = require("../controllers/userController");
-    const scoreController = require("../controllers/scoreController");
-    const staticResourceController = require("../controllers/StaticResourceController")
+    const gameController = require("../controllers/gameController");
     
-    //parameters in the query
-    app.get('/users', userController.findAll);
-    app.get('/scores/create', scoreController.createScore); 
-    app.get('/scores', scoreController.findAll);
-    app.get('/score/user', scoreController.findByUserId);
-    app.get('/score/updatePoints', scoreController.updateScore);
+    //Game
+    app.get("/past-scores", userController.getPastScores);
+    app.post("/score", gameController.getScore);
+    app.post("/add-score", userController.insertScore);
 
+    app.get("/getGame", gameController.createGame);
+    app.post("/submit", gameController.submitAnswer);
 
     /* Pages */
     app.get("/", staticResourceController.getHomePage);

@@ -28,7 +28,7 @@ function switchMenu(){
     mainEl.appendChild(containerEl);
 }
 
-function switchPlay() {
+async function switchPlay() {
     console.log("switch play");
 
     const mainEl = document.getElementById("mainEl");
@@ -40,12 +40,12 @@ function switchPlay() {
     mainEl.appendChild(containerEl);
 
 
-    getGame();
+    await getGame();
     const firstRound = getNextRound();
-    switchRound(firstRound.roundID, firstRound.lyrics, firstRound.options);
+    await switchRound(firstRound.roundId, firstRound.lyrics, firstRound.options);
 }
 
-function switchRound(roundID, lyrics, options) {
+async function switchRound(roundID, lyrics, options) {
     console.log("switch round");
 
     const containerEl = document.getElementById("roundContainer");
@@ -53,7 +53,7 @@ function switchRound(roundID, lyrics, options) {
 
     const lyricsEl = document.createElement("p");
     lyricsEl.setAttribute("id", "gameLyric");
-    lyricsEl.innerText = lyrics;
+    lyricsEl.innerText = lyricParser(lyrics);
 
     containerEl.appendChild(lyricsEl);
 
@@ -61,13 +61,13 @@ function switchRound(roundID, lyrics, options) {
         const optionEl = document.createElement("button");
         optionEl.setAttribute("class", "gameOption");
         optionEl.innerText = options[i].title + " - " + options[i].artist;
-        optionEl.onclick = function() { submitAnswer(roundID, i); }
+        optionEl.onclick = async function() { await submitAnswer(roundID, options[i].title, options[i].artist); }
         containerEl.appendChild(optionEl);
     }
 
 }
 
-function switchScore() {
+async function switchScore() {
 
     const mainEl = document.getElementById("mainEl");
     mainEl.innerHTML = "";
@@ -83,7 +83,7 @@ function switchScore() {
 
     mainEl.appendChild(containerEl);
 
-    const score = getScore();
+    const score = await getScore();
 
     console.log(score);
 
@@ -92,7 +92,7 @@ function switchScore() {
         scoreEl.setAttribute("class", "scoreCard");
 
         const lyricEl = document.createElement("p");
-        lyricEl.innerText = s.lyrics;
+        lyricEl.innerText = lyricParser(s.lyrics);
 
         const songEl = document.createElement("p");
         songEl.innerText = s.yourAnswer.title + " - " + s.yourAnswer.artist;
@@ -107,7 +107,7 @@ function switchScore() {
     containerEl.appendChild(btnHome);
 }
 
-function switchPastGames() {
+async function switchPastGames() {
     const mainEl = document.getElementById("mainEl");
     mainEl.innerHTML = "";
 
@@ -115,12 +115,12 @@ function switchPastGames() {
     containerEl.setAttribute("id", "pastGameContainer");
     containerEl.innerHTML = "";
 
-    const pastGames = getPastGames();
+    const pastGames = await getPastGames();
 
     const user = getCookie("user");
 
     const ratingEl = document.createElement("p");
-    ratingEl.innerText = user + ": " + pastGames.rating;
+    ratingEl.innerText = user + ": " + ((pastGames.rating == undefined)? "0" : pastGames.rating);
 
     containerEl.appendChild(ratingEl);
     
@@ -131,10 +131,10 @@ function switchPastGames() {
 
     mainEl.appendChild(containerEl);
 
-    pastGames.games.forEach(g => {
+    if (pastGames.games != undefined) pastGames.games.forEach(g => {
         const pg = document.createElement("p");
         pg.setAttribute("class", "pgItem");
-        pg.innerText = g.date + ": " + g.score + "/" + g.total;
+        pg.innerText = g.date + ": " + g.score + "/" + g.overall_result;
 
         listContainerEl.appendChild(pg);
     });
@@ -165,4 +165,13 @@ function getCookie(cname) {
 
 function goHome() {
     location.href = "/";
+}
+
+function lyricParser(lyric) {
+    let lyrArr = lyric.split("\\n");
+
+    if (lyrArr[2].charAt(0) != '"')
+        lyrArr[2] = '"' + lyrArr[2];
+
+    return lyrArr[2].replace("//", "") + "\n" + lyrArr[3].replace("//", "") + "\n"  + lyrArr[4].replace("//", "") + "\"";
 }

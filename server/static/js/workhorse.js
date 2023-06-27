@@ -1,3 +1,5 @@
+const mainUrl = "http://localhost:8080";
+
 let game = { }
 
 function logoutExecute() {
@@ -14,121 +16,106 @@ function logoutExecute() {
     location.href = "/authenticate";
 }
 
-function getGame() {
-    const result = {
-        gameID: "example",
-        rounds: [
-            {
-                roundId: "1",
-                lyrics: "Baby, bay, baby.. ohhh",
-                options: [
-                    {
-                        artist: "Justin Bieber",
-                        title: "Baby"
-                    },
-                    {
-                        artist: "Post Malone",
-                        title: "Love Me"
-                    },
-                    {
-                        artist: "John Cena",
-                        title: "Goodness"
-                    },
-                    {
-                        artist: "Bob",
-                        title: "FML"
-                    }
-                ]
-            },
-            {
-                roundId: "2",
-                lyrics: "'Got so much wood I can build me a fort",
-                options: [
-                    {
-                        artist: "Justin Bieber",
-                        title: "Baby"
-                    },
-                    {
-                        artist: "Post Malone",
-                        title: "Love Me"
-                    },
-                    {
-                        artist: "John Cena",
-                        title: "Goodness"
-                    },
-                    {
-                        artist: "Bob",
-                        title: "FML"
-                    }
-                ]
-            }
-        ]
+async function getGame() {
+
+    console.log("getting game");
+
+    let config = {
+        withCredentials: true
     }
 
-    game = result;
+    const result = await axios.get(
+        mainUrl + "/getGame",
+        config
+    );
+
+    console.log(result);
+
+    game = result.data;
 }
 
 function getNextRound() {
     return (game.rounds.length > 0)? game.rounds.shift() : undefined;
 }
 
-function submitAnswer(roundID, optionNumber) {
+async function submitAnswer(roundID, title, artist) {
 
-    const result = {
-        isCorrect: true
+    let config = {
+        withCredentials: true
     }
+
+    let data = {
+        gameId: game.gameId,
+        roundId: roundID,
+        answer: {
+            artist: artist,
+            title: title
+        }
+    }
+
+    console.log(data);
+
+    const result = await axios.post(
+        mainUrl + "/submit",
+        data,
+        config
+    );
 
     const nextRound = getNextRound();
 
     if (nextRound == undefined) {
-        switchScore();
+
+        data = {
+            gameId: game.gameId,
+            username: getCookie("user")
+        }
+
+        const result = await axios.post(
+            mainUrl + "/add-score",
+            data,
+            config
+        );
+
+        console.log(result);
+
+        await switchScore();
         return;
     }
 
-    switchRound(nextRound.roundID, nextRound.lyrics, nextRound.options);
+    await switchRound(nextRound.roundId, nextRound.lyrics, nextRound.options);
 }
 
-function getScore() {
-    const result = [
-        {
-            roundID: "1",
-            lyrics: "Baby, bay, baby.. ohhh",
-            yourAnswer: {
-                artist: "Justin Bieber",
-                title: "Baby"
-            },
-            isCorrect: true
-        },
-        {
-            roundID: "2",
-            lyrics: "'Got so much wood I can build me a fort",
-            yourAnswer: {
-                artist: "Bob",
-                title: "FML"
-            },
-            isCorrect: false
-        }
-    ]
+async function getScore() {
 
-    return result;
-}
-
-function getPastGames() {
-    const result = {
-        rating: 50,
-        games: [
-            {
-                date: "22/07/2023",
-                score: 5,
-                total : 10
-            },
-            {
-                date: "22/20/2023",
-                score: 3,
-                total : 6
-            }
-        ]
+    let config = {
+        withCredentials: true
     }
 
-    return result;
+    let data = {
+        "gameId": game.gameId
+    }
+
+    const result = await axios.post(
+        mainUrl + "/score",
+        data,
+        config
+    );
+
+    console.log(result.data);
+
+    return result.data;
+}
+
+async function getPastGames() {
+
+    let config = {
+        withCredentials: true
+    }
+
+    const result = await axios.get(
+        mainUrl + "/past-scores?username=" + getCookie("user"),
+        config
+    );
+
+    return result.data;
 }
